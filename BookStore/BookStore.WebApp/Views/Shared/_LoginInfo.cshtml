@@ -1,0 +1,39 @@
+@using BookStore.WebApp.Models
+@inject Microsoft.AspNetCore.Identity.SignInManager<User> _signInManager
+@inject BookStore.WebApp.Services.IUserService _userService
+@inject BookStore.WebApp.Data.IUserRepository _userRepository
+
+@if(_signInManager.IsSignedIn(User))
+{
+    IEnumerable<string> roles = await _userRepository.GetUserRoles(_userService.GetUserId());
+    <li class="nav-item dropdown navbar-nav">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+            Hello @((roles.Contains("Admin")? " (Admin) ":"") + User.FindFirst("FirstName").Value + " " + User.FindFirst("LastName").Value)
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <p class="px-4">
+                Signed In as <br/>
+                @User.Identity.Name
+            </p>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" asp-controller="Book" asp-action="Library">Your Library</a>
+            <a class="dropdown-item" href="#">Your Favorites</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" asp-controller="User" asp-action="ChangePassword">Change password</a>
+            <a class="dropdown-item" asp-controller="User" asp-action="Logout">Logout</a>
+        </div>
+    </li>
+}
+else
+{
+    <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="User" asp-action="Login" asp-route-returnUrl=@Context.Request.Path>Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="User" asp-action="Signup">Register</a>
+            </li>
+        </ul>
+    </div>
+}
